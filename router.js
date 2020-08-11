@@ -12,6 +12,7 @@ router.get('/students',function(req,res){
     if(err){
       return res.status(500).send('server err')
     }
+    // console.log(students);
     res.render('index.html',{
       fruits:[
         '苹果',
@@ -29,29 +30,48 @@ router.get('/students/new',function(req,res){
 })
 // 添加数据
 router.post('/students/new',function(req,res){
-  Student.save(req.body,function(err){
+  // Student.save(req.body,function(err){
+  //   if(err){
+  //     res.status(500).send('server err')
+  //   }
+  //   console.log('添加成功');
+  //   res.redirect('/students')
+  // })
+  const stu = new Student(req.body)
+  stu.save(function(err){
     if(err){
       res.status(500).send('server err')
     }
-    console.log('添加成功');
+    console.log('添加成功')
     res.redirect('/students')
   })
 })
 // 编辑学生数据页面
 router.get('/students/edit',function(req,res){
   // 通过id获取数据，渲染到模板页
-  Student.findById(parseInt(req.query.id),function(err,student){
+  // Student.findById(parseInt(req.query.id),function(err,student){
+  //   if(err){
+  //     res.status(500).send('server err')
+  //   }
+  //   res.render('edit.html',{
+  //     student:student
+  //   })
+  // })
+  Student.findById(req.query.id.replace(/"/g,''),function(err,ret){
     if(err){
       res.status(500).send('server err')
     }
+    console.log(ret);
     res.render('edit.html',{
-      student:student
+      student:ret
     })
   })
 })
 // 保存编辑后的学生数据
 router.post('/students/edit',function(req,res){
-  Student.update(req.body,function(err){
+  // console.log(req.body.id.replace(/"/g,''));
+  var id = req.body.id.replace(/"/g,'')
+  Student.findByIdAndUpdate(id,req.body,function(err){
     if(err){
       res.status(500).send('server err')
     }
@@ -60,7 +80,7 @@ router.post('/students/edit',function(req,res){
 })
 // 删除学生数据
 router.get('/students/delete',function(req,res){
-  Student.deleteById(req.query.id,function(err){
+  Student.findByIdAndRemove(req.query.id.replace(/"/g,''),function(err){
     if(err){
       res.status(500).send('server err')
     }
